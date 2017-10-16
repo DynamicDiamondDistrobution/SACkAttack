@@ -1,0 +1,178 @@
+<!doctype html> 
+<html lang="en"> 
+<head> 
+	<meta charset="UTF-8" />
+    <title>SACk Attack Demo Main</title>
+    <script src="//cdn.jsdelivr.net/phaser/2.2.2/phaser.min.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+<script type="text/javascript">
+
+// set game loading
+var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+
+// load variables for use
+var platforms;
+var player;
+var cursors;
+var score = 0;
+var scoreText;
+var frameTime = 0;
+var frames;
+var prevCamX = 0;
+var mob;
+var book;
+
+function preload() {
+
+	// load images for use
+    game.load.image('sky', 'assets/sky.png');
+    game.load.image('ground', 'assets/testg.png');
+    game.load.image('book', 'assets/newBook.png');
+	game.load.image('spike', 'assets/spike.png');
+	game.load.image('baddie2', 'assets/OGBaddie.png', 32, 32);
+    game.load.image('dude', 'assets/newDude.png', 32, 32);
+	game.load.spritesheet('baddie', 'assets/baddie.png', 32, 32);
+	game.load.spritesheet('ranged', 'assets/rangedBaddie.png', 32,32);
+
+}
+
+function create() {
+
+	// set boundaries
+	game.world.setBounds(0, 0, 3200, 600);
+	//  We're going to be using physics, so enable the Arcade Physics system
+    game.physics.startSystem(Phaser.Physics.ARCADE);
+
+    //  A simple background for our game
+    var background = game.add.sprite(0, 0, 'sky');
+	background.scale.setTo(4, 2);
+	
+	// add score to the game
+	scoreText = game.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000000', align: 'center' });
+	
+	scoreText.fixedToCamera = true;
+    scoreText.cameraOffset.setTo(16, 16);
+	
+	// Start physics engine
+	game.physics.startSystem(Phaser.Physics.ARCADE);
+	
+	platforms = game.add.group();
+	
+	platforms.enableBody = true;
+	
+	 // Here we create the ground.
+    var ground = platforms.create(0, game.world.height - 32, 'ground');
+
+    //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
+    ground.scale.setTo(8, 2);
+
+    //  This stops it from falling away when you jump on it
+    ground.body.immovable = true;
+	
+	// The player and its settings 
+    player = game.add.sprite(32, game.world.height - 150, 'dude');
+	player.anchor.setTo(.5, 1);
+	
+	//  We need to enable physics on the player
+    game.physics.arcade.enable(player);
+
+    //  Player physics properties.
+    player.body.bounce.y = 0.2;
+    player.body.gravity.y = 300;
+    player.body.collideWorldBounds = true;
+	
+	var ledge = platforms.create(400, 400, 'ground');
+
+    ledge.body.immovable = true;
+	
+	mob = game.add.group();
+	
+	var spike = mob.create(450,390, 'spike');
+	spike.anchor.setTo(0.5, 1);
+	
+	game.physics.arcade.enable(spike);
+	spike.body.gravity.y = 25;
+		
+	var roller = mob.create(450, 500, 'baddie2');
+	roller.anchor.setTo(0.5, 1);
+	roller.frame = 0;
+	game.physics.arcade.enable(roller);
+	roller.body.gravity.y = 300;
+	roller.body.collideWorldBounds = true;
+	
+	game.camera.follow(player);
+
+	// controls
+	cursors = game.input.keyboard.createCursorKeys();
+
+}
+
+function update() {
+
+	//  Collide the items with the platforms
+    var hitPlatform = game.physics.arcade.collide(player, platforms);
+	game.physics.arcade.collide(book, platforms);
+	game.physics.arcade.collide(mob, platforms);
+	
+	//  Reset the players velocity (movement)
+    player.body.velocity.x = 0;
+
+    if (cursors.left.isDown)
+    {
+        //  Move to the left
+        player.body.velocity.x = -150;
+		player.scale.x = -1;
+        // player.animations.play('left'); only needed with spritesheet
+    }
+    else if (cursors.right.isDown)
+    {
+        //  Move to the right
+        player.body.velocity.x = 150;
+		player.scale.x = 1;
+        // player.animations.play('right'); only needed with spritesheet
+    }
+	
+		<!-- else -->
+    <!-- { -->
+        <!-- //  Stand still -->
+        <!-- player.animations.stopPlayer(); -->
+
+    <!-- } -->
+
+    //  Allow the player to jump if they are touching the ground.
+    if (cursors.up.isDown && player.body.touching.down && hitPlatform)
+    {
+        player.body.velocity.y = -350;
+    }
+
+}
+
+function move(roller){
+
+	if(Math.floor(roller.x /10) == Math.floor(oller.xDest /10)){
+		roller.body.velocity.x = 0;
+	}
+	else if(Math.floor(roller.x) < Math.floor(roller.xDest)){
+		roller.body.velocity.x = roller.speed;
+		roller.scale.x = -1;
+	}
+	else if(Math.floor(roller.x) > Math.floor(roller.xDest)){
+		roller.body.velocity.x = roller.speed;
+		roller.scale.x = 1;
+	}
+
+}
+
+
+
+</script>
+
+</body>
+</html>
