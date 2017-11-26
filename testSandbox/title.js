@@ -19,6 +19,7 @@ var titleState = {
 		//******************
 		// Only  for testing!!!! This is removed for normal operation
 		//**********************
+		
 		game.state.start('play')
 	},
 	update: function(){
